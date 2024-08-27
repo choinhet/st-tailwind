@@ -34,7 +34,6 @@ def tw_wrap(element: T, classes="") -> T:
     @wraps(element)
     def wrapped(*args, **kwargs):
         popped_classes = kwargs.pop("classes", "")
-        print(kwargs)
         clz = classes or popped_classes
         first_arg = next(iter(args), None)
         if first_arg is None or not _is_valid_text(first_arg):
