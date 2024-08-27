@@ -2,9 +2,18 @@
 
 ## If you find this project useful, please consider leaving a star <3
 
-## Usage
+This project, Streamlit Tailwind, is designed to simplify the process of creating user interfaces. It provides a straightforward way to incorporate Tailwind CSS into your Streamlit
+applications. So, without further ado:
 
-This project, Streamlit Tailwind, is designed to simplify the process of creating user interfaces. It provides a straightforward way to incorporate Tailwind CSS into your Streamlit applications. So, without further ado:
+## Install
+
+Same as always, good ol' pip (or equivalents)
+
+```sh
+pip install st_tailwind
+```
+
+## Usage
 
 ### First way:
 

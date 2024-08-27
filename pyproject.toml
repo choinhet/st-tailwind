@@ -1,6 +1,6 @@
 [project]
 name = "st_tailwind"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python tailwind toolkit - Injected with JS"
 authors = [
     {name = "rafael.choinhet", email = "choinhet@gmail.com"},
