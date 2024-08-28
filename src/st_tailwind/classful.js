@@ -47,7 +47,7 @@ function addClassesToElement(selector, text, classes) {
         console.log("Could not find element using query", selector)
         console.log("And text", text)
     } else {
-        element.classList.add(classes)
+        element.classList.add(classes.split(" "))
     }
 }
 

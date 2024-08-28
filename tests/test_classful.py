@@ -27,10 +27,27 @@ def _all_instances():
     tw.status("test")
 
 
+def _test_container(classes=""):
+    import st_tailwind as tw
+    tw.container(classes=classes)
+
+
 class MyTestCase(unittest.TestCase):
     @staticmethod
     def test_component_instances():
         at = AppTest.from_function(_all_instances)
+        at.run()
+        assert not at.exception
+
+    @staticmethod
+    def test_one_class_add():
+        at = AppTest.from_function(lambda: _test_container(classes="w-full"))
+        at.run()
+        assert not at.exception
+
+    @staticmethod
+    def test_two_classes_add():
+        at = AppTest.from_function(lambda: _test_container(classes="flex flex-col"))
         at.run()
         assert not at.exception
 
