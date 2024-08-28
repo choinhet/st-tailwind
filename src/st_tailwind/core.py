@@ -28,7 +28,19 @@ _st_map = {
     st.status: "[data-testid='stExpander']",
 }
 
-instance_cache = {}
+
+def _get_from_cache(key: str):
+    if not st.session_state.get("tw-cache"):
+        st.session_state["tw-cache"] = {}
+
+    if key in st.session_state["tw-cache"]:
+        result = st.session_state["tw-cache"][key] + 1
+        st.session_state["tw-cache"][key] = result
+        return result
+
+    st.session_state["tw-cache"][key] = 0
+    return 0
+
 
 T = TypeVar("T")
 
@@ -53,7 +65,6 @@ def tw_wrap(
         selector = _st_map.get(element)
 
         if not popped_classes:
-            _increase_pos_and_get(selector)
             return element(*args, **kwargs)
 
         _add_classes(classes=popped_classes, selector=selector, pos=popped_pos)
@@ -66,11 +77,10 @@ def tw_wrap(
 def _add_classes(classes: str, selector: str, pos: Optional[int] = None):
     classful_js = _read_text_with_cache("classful.min.js")
 
+    cur_pos = _get_from_cache(selector)
+
     if pos:
-        _increase_pos_and_get(selector)
-        cur_pos = pos
-    else:
-        cur_pos = _increase_pos_and_get(selector)
+        cur_pos = _get_from_cache(selector)
 
     classful_js = classful_js \
         .replace("%CLASSES%", str(classes)) \
@@ -82,12 +92,6 @@ def _add_classes(classes: str, selector: str, pos: Optional[int] = None):
         height=0,
         width=0
     )
-
-
-def _increase_pos_and_get(selector):
-    pos = instance_cache.setdefault(selector, -1) + 1
-    instance_cache[selector] = pos
-    return pos
 
 
 @st.cache_resource
