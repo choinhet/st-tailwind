@@ -1,4 +1,3 @@
-import inspect
 import logging
 import os
 from functools import wraps
@@ -8,34 +7,32 @@ from typing import TypeVar
 import streamlit as st
 import streamlit.components.v1 as components
 
-_st_map = {
-    st.tabs: "[data-testid='stTabs']",
-    st.columns: "[data-testid='stHorizontalBlock']",
-    st.container: "[data-testid='stVerticalBlockBorderWrapper']",
-    st.multiselect: "[data-testid='stMultiSelect']",
-    st.selectbox: "[data-testid='stSelectbox']",
-    st.text: "[data-testid='stText']",
-    st.markdown: "[data-testid='stMarkdown']",
-    st.button: "[data-testid='stBaseButton-secondary']",
-    st.download_button: "[data-testid='stBaseButton-secondary']",
-    st.file_uploader: "[data-testid='stFileUploaderDropzone']",
-    st.dataframe: "[data-testid='stDataFrameResizable']",
-    st.data_editor: "[data-testid='stDataFrameResizable']",
-    st.checkbox: "[data-testid='stCheckbox']",
-    st.text_input: "[data-testid='stTextInput']",
-    st.text_area: "[data-testid='stTextArea']",
-    st.spinner: "[data-testid='stSpinner']",
-    st.toast: "[data-testid='stToast']",
-    st.divider: "[data-testid='stMarkdown']",
-    st.progress: "[data-baseweb='progress-bar']",
-    st.date_input: "[data-testid='stDateInput']",
-    st.status: "[data-testid='stExpander']",
+nth_child_map = {
+    st.tabs: 0,
+    st.columns: 0,
+    st.container: 0,
+    st.multiselect: 5,
+    st.selectbox: 5,
+    st.text: 1,
+    st.markdown: 0,
+    st.button: 2,
+    st.download_button: 2,
+    st.file_uploader: 5,
+    st.dataframe: 2,
+    st.data_editor: 2,
+    st.checkbox: 2,
+    st.text_input: 6,
+    st.text_area: 6,
+    st.spinner: 1,
+    st.toast: 2,
+    st.divider: 3,
+    st.progress: 4,
+    st.date_input: 5,
+    st.status: 2,
 }
 
 T = TypeVar("T")
-pos_cache = {}
 log = logging.getLogger(__name__)
-previous_call = None
 
 
 def tw_wrap(
@@ -45,76 +42,27 @@ def tw_wrap(
     """
     :param element: element to be wrapped
     :param classes: tailwind classes separated by spaces ("w-full bg-color-red")
-    :param pos: Instantiation position (e.g. `N` instance of a given streamlit object)
     :return: wrapped element with tailwind classes
     """
 
     # noinspection PyDefaultArgument
     @wraps(element)
     def wrapped(*args, **kwargs):
-        frame = inspect.currentframe()
-        caller_frame = frame.f_back
-        file_name = caller_frame.f_code.co_filename.split(os.sep)[-1].replace(".py", "")
-        line_number = caller_frame.f_lineno
-        id_ = f"{file_name}L{line_number}"
-
         popped_classes = kwargs.pop("classes", classes)
-        selector = _st_map.get(element)
-
         result = element(*args, **kwargs)
-
         if not popped_classes:
-            _get_from_cache(selector, id_)
             return result
-
-        _add_classes(classes=popped_classes, selector=selector, id=id_)
-
+        _add_classes(classes=popped_classes, cur_type=element)
         return result
 
     return wrapped
 
 
-def _get_from_cache(selector, id) -> int:
-    global previous_call
-    global pos_cache
-
-    semi_id = f"{selector}-{id}"
-
-    for key in pos_cache:
-        if key.startswith(semi_id) and previous_call != semi_id:
-            log.debug(f"Returning from cache {key}")
-            return pos_cache[key]
-
-    previous_call = semi_id
-
-    num_instances = []
-    for key in pos_cache:
-        if key.startswith(selector):
-            num_instances.append(int(key.split("-")[-1]))
-
-    if num_instances:
-        new_pos = max(num_instances) + 1
-        new_key = f"{selector}-{id}-{new_pos}"
-        pos_cache[new_key] = new_pos
-        log.debug(f"Returning a new instance {new_key}")
-        return new_pos
-
-    new_key = f"{selector}-{id}-0"
-    pos_cache[new_key] = 0
-
-    log.debug(f"Creating new entry {new_key}")
-    return 0
-
-
-def _add_classes(classes: str, selector: str, id: str):
-    classful_js = _read_text_with_cache("classful.min.js")
-
-    cur_pos = _get_from_cache(selector, id)
-
+def _add_classes(classes: str, cur_type: str):
+    classful_js = _read_text_with_cache("classful.js")
     classful_js = classful_js \
         .replace("%CLASSES%", str(classes)) \
-        .replace("%POS%", str(cur_pos)) \
-        .replace("%SELECTOR%", str(selector))
+        .replace("%IDX%", str(nth_child_map[cur_type]))
 
     components.html(
         f"<script>{classful_js}</script>",

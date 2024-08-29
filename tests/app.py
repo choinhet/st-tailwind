@@ -18,6 +18,8 @@ with tab1:
 
     tw.text("test", classes="bg-blue-600")
     tw.button("test", classes="bg-blue-600")
+    tw.download_button("download", "test", classes="bg-blue-600")
+    tw.file_uploader("test", classes="bg-blue-600")
 
     tw.dataframe(pd.DataFrame(), classes="bg-blue-600")
     tw.data_editor(pd.DataFrame(), classes="bg-blue-600")
@@ -27,12 +29,12 @@ with tab1:
     tw.text_input("test", classes="bg-blue-600")
     tw.text_area("test", classes="bg-blue-600")
 
-    tw.spinner("test", classes="w-full")
-    tw.toast("test", classes="w-full")
-    tw.divider(classes="w-full")
-    tw.progress(10, classes="w-full")
-    tw.date_input("test", classes="w-full")
-    tw.status("test", classes="w-full")
+    tw.spinner("test", classes="bg-blue-600")
+    tw.toast("test", classes="bg-blue-600")
+    tw.divider(classes="bg-blue-600")
+    tw.progress(10, classes="bg-blue-600")
+    tw.date_input("test", classes="bg-blue-600")
+    tw.status("test", classes="bg-blue-600")
 
 with tab2:
     tw.button("hello", classes="bg-red-600")

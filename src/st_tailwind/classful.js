@@ -1,3 +1,5 @@
+// noinspection JSUnresolvedReference
+
 function checkAndInjectTailwind() {
     const isTailwindPresent = Array
         .from(parent.document.scripts)
@@ -11,7 +13,6 @@ function checkAndInjectTailwind() {
         setTimeout(() => {
             parent.tailwind.config = {important: true, theme: {extend: {}}}
         }, 250)
-    } else {
     }
 }
 
@@ -23,12 +24,10 @@ function removeUnwantedMargin() {
 }
 
 function addClassesToElement() {
-    let element = [...parent.document.querySelectorAll("%SELECTOR%")]["%POS%"];
-    if (element == null) {
-    } else {
-        let tokens = "%CLASSES%".split(" ");
-        element.classList.add(...tokens)
-    }
+    let child = window.frameElement.parentNode.previousSibling.previousSibling;
+    let element = Array.from(child.getElementsByTagName("*")).toSpliced(0, 0, child)[Number("%IDX%")]
+    let tokens = "%CLASSES%".split(" ");
+    element.classList.add(...tokens)
 }
 
 setTimeout(() => {
