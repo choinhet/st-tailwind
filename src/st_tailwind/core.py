@@ -1,7 +1,9 @@
+import inspect
+import logging
 import os
 from functools import wraps
 from pathlib import Path
-from typing import TypeVar, Optional
+from typing import TypeVar
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -14,7 +16,9 @@ _st_map = {
     st.selectbox: "[data-testid='stSelectbox']",
     st.text: "[data-testid='stText']",
     st.markdown: "[data-testid='stMarkdown']",
-    st.button: "[data-testid='stButton']",
+    st.button: "[data-testid='stBaseButton-secondary']",
+    st.download_button: "[data-testid='stBaseButton-secondary']",
+    st.file_uploader: "[data-testid='stFileUploaderDropzone']",
     st.dataframe: "[data-testid='stDataFrameResizable']",
     st.data_editor: "[data-testid='stDataFrameResizable']",
     st.checkbox: "[data-testid='stCheckbox']",
@@ -28,27 +32,15 @@ _st_map = {
     st.status: "[data-testid='stExpander']",
 }
 
-
-def _get_from_cache(key: str):
-    if not st.session_state.get("tw-cache"):
-        st.session_state["tw-cache"] = {}
-
-    if key in st.session_state["tw-cache"]:
-        result = st.session_state["tw-cache"][key] + 1
-        st.session_state["tw-cache"][key] = result
-        return result
-
-    st.session_state["tw-cache"][key] = 0
-    return 0
-
-
 T = TypeVar("T")
+pos_cache = {}
+log = logging.getLogger(__name__)
+previous_call = None
 
 
 def tw_wrap(
     element: T,
     classes: str = "",
-    pos: Optional[int] = None
 ) -> T:
     """
     :param element: element to be wrapped
@@ -57,30 +49,67 @@ def tw_wrap(
     :return: wrapped element with tailwind classes
     """
 
+    # noinspection PyDefaultArgument
     @wraps(element)
     def wrapped(*args, **kwargs):
-        popped_classes = kwargs.pop("classes", classes)
-        popped_pos = kwargs.pop("pos", pos) or 0
+        frame = inspect.currentframe()
+        caller_frame = frame.f_back
+        file_name = caller_frame.f_code.co_filename.split(os.sep)[-1].replace(".py", "")
+        line_number = caller_frame.f_lineno
+        id_ = f"{file_name}L{line_number}"
 
+        popped_classes = kwargs.pop("classes", classes)
         selector = _st_map.get(element)
 
+        result = element(*args, **kwargs)
+
         if not popped_classes:
-            return element(*args, **kwargs)
+            _get_from_cache(selector, id_)
+            return result
 
-        _add_classes(classes=popped_classes, selector=selector, pos=popped_pos)
+        _add_classes(classes=popped_classes, selector=selector, id=id_)
 
-        return element(*args, **kwargs)
+        return result
 
     return wrapped
 
 
-def _add_classes(classes: str, selector: str, pos: Optional[int] = None):
+def _get_from_cache(selector, id) -> int:
+    global previous_call
+    global pos_cache
+
+    semi_id = f"{selector}-{id}"
+
+    for key in pos_cache:
+        if key.startswith(semi_id) and previous_call != semi_id:
+            log.debug(f"Returning from cache {key}")
+            return pos_cache[key]
+
+    previous_call = semi_id
+
+    num_instances = []
+    for key in pos_cache:
+        if key.startswith(selector):
+            num_instances.append(int(key.split("-")[-1]))
+
+    if num_instances:
+        new_pos = max(num_instances) + 1
+        new_key = f"{selector}-{id}-{new_pos}"
+        pos_cache[new_key] = new_pos
+        log.debug(f"Returning a new instance {new_key}")
+        return new_pos
+
+    new_key = f"{selector}-{id}-0"
+    pos_cache[new_key] = 0
+
+    log.debug(f"Creating new entry {new_key}")
+    return 0
+
+
+def _add_classes(classes: str, selector: str, id: str):
     classful_js = _read_text_with_cache("classful.min.js")
 
-    cur_pos = _get_from_cache(selector)
-
-    if pos:
-        cur_pos = _get_from_cache(selector)
+    cur_pos = _get_from_cache(selector, id)
 
     classful_js = classful_js \
         .replace("%CLASSES%", str(classes)) \
@@ -96,6 +125,7 @@ def _add_classes(classes: str, selector: str, pos: Optional[int] = None):
 
 @st.cache_resource
 def _read_text_with_cache(name: str) -> str:
+    cache = {}
     full_path = Path(os.path.dirname(__file__)) / name
     with open(str(full_path), "r") as f:
         return f.read()
@@ -120,3 +150,5 @@ divider = tw_wrap(st.divider)
 progress = tw_wrap(st.progress)
 date_input = tw_wrap(st.date_input)
 status = tw_wrap(st.status)
+download_button = tw_wrap(st.download_button)
+file_uploader = tw_wrap(st.file_uploader)

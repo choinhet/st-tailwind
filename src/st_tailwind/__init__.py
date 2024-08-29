@@ -5,6 +5,8 @@ __all__ = [
     "selectbox",
     "text",
     "button",
+    "download_button",
+    "file_uploader",
     "dataframe",
     "data_editor",
     "checkbox",
