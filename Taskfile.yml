@@ -8,7 +8,7 @@ tasks:
       - uv {{.CLI_ARGS}}
   publish:
     cmds:
-      - uv publish --token {{PY_PI_TOKEN}}
+      - uv publish --token {{PYPI_TOKEN}}
   run:
     cmds:
       - uv streamlit run test/examples.py
