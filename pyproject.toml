@@ -1,6 +1,6 @@
 [project]
 name = "st_tailwind"
-version = "1.0.3"
+version = "1.0.4"
 description = "Python tailwind toolkit - Injected with JS"
 authors = [
     {name = "rafael.choinhet", email = "choinhet@gmail.com"},
@@ -11,11 +11,3 @@ dependencies = [
 requires-python = ">=3.9.10"
 readme = "README.md"
 license = {text = "MIT"}
-
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
-
-[tool.pdm]
-distribution = true

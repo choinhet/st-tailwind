@@ -1,0 +1,9 @@
+version: '3'
+
+tasks:
+  run:
+    cmds:
+      - uv streamlit run test/container.py
+  requirements:
+    cmds:
+      - uv pip compile pyproject.toml -o requirements.txt
