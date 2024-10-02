@@ -27,7 +27,7 @@ def initialize_tailwind():
 def get_style_frame(cls, classes=""):
     current_id = correspondence.get(cls)
     if current_id is None:
-        log.debug("Correspondence to component of class '' not found.")
+        log.debug(f"Correspondence to component of class '{cls}' not found.")
         return
     filled_template = TEMPLATE.replace("%ID%", current_id).replace("%CLASSES%", classes)
     return html(f"<script>{filled_template}</script>")
