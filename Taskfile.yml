@@ -1,9 +1,17 @@
 version: '3'
 
+dotenv: [ ".env" ]
+
 tasks:
+  uv:
+    cmds:
+      - uv {{.CLI_ARGS}}
+  publish:
+    cmds:
+      - uv publish --token {{PY_PI_TOKEN}}
   run:
     cmds:
-      - uv streamlit run test/container.py
+      - uv streamlit run test/examples.py
   requirements:
     cmds:
       - uv pip compile pyproject.toml -o requirements.txt
