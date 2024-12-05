@@ -1,6 +1,7 @@
 let doc = parent.document;
+doc.appending = false;
 
-doc.injectTw = function() {
+doc.injectTw = function () {
     let head = doc.getElementsByTagName("head")[0];
 
     let cdn = doc.createElement("script");
@@ -25,7 +26,7 @@ doc.reinjectTw = function () {
     }
 }
 
-doc.removeMargin = function(currentWindow) {
+doc.removeMargin = function (currentWindow) {
     let iframe_parent = currentWindow.frameElement.parentNode
     iframe_parent.style.display = "none";
     iframe_parent.style.width = "unset";
@@ -33,5 +34,5 @@ doc.removeMargin = function(currentWindow) {
 }
 
 doc.injectTw();
-setTimeout(doc.reinjectTw, timeout=50);
+setTimeout(doc.reinjectTw, timeout = 50);
 doc.removeMargin(window);

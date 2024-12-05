@@ -10,8 +10,8 @@ import st_tailwind.resources.frontend as front_resources
 from st_tailwind.const import correspondence
 
 FRONT_PATH = Path(str(importlib_resources.files(front_resources)))
-INIT = (FRONT_PATH / "init.min.js").read_text()
-TEMPLATE = (FRONT_PATH / "add.min.js").read_text()
+INIT = (FRONT_PATH / "init.js").read_text()
+TEMPLATE = (FRONT_PATH / "add.js").read_text()
 
 log = logging.getLogger("st_tailwind")
 
