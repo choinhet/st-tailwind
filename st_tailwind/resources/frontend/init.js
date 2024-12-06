@@ -25,9 +25,7 @@ doc.addTokens = async function (id, classes, currentWindow) {
     document.head.appendChild(script);
 
     if (typeof twi === 'undefined') {
-        console.log('Waiting for tw-to-css to load...');
         await new Promise(resolve => script.onload = resolve);
-        console.log('tw-to-css loaded successfully');
     }
 
     let inlineCss = twi(classes);
