@@ -1,7 +1,7 @@
 const esbuild = require('esbuild');
 
 esbuild.build({
-    entryPoints: ['init.js', 'add.js'],
+    entryPoints: ['init.js'],
     bundle: true,
     outdir: './',
     entryNames: '[name].min',
