@@ -1,6 +1,6 @@
 [project]
 name = "st_tailwind"
-version = "1.0.5"
+version = "1.0.6"
 description = "Python tailwind toolkit - Injected with JS"
 authors = [{ name = "rafael.choinhet", email = "choinhet@gmail.com" }]
 dependencies = ["streamlit>=1.38.0"]
