@@ -29,7 +29,6 @@ def get_style_frame(cls, classes=""):
         log.debug(f"Correspondence to component of class '{cls}' not found.")
         return
     text = f'<script>parent.document.addTokens("{current_id}", "{classes}", window)</script>'
-    print(text)
     return html(text)
 
 
