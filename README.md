@@ -1,6 +1,6 @@
 # Streamlit Tailwind
 
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](../../actions/workflows/coverage.yml)
+[![codecov](https://codecov.io/gh/choinhet/st-tailwind/graph/badge.svg?token=${CODECOV_TOKEN})](https://codecov.io/gh/choinhet/st-tailwind)
 
 ## If you find this project useful, please consider leaving a star <3
 
