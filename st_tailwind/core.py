@@ -11,7 +11,6 @@ from st_tailwind.const import correspondence
 
 FRONT_PATH = Path(str(importlib_resources.files(front_resources)))
 INIT = (FRONT_PATH / "init.min.js").read_text()
-TEMPLATE = (FRONT_PATH / "add.min.js").read_text()
 
 log = logging.getLogger("st_tailwind")
 
@@ -29,8 +28,8 @@ def get_style_frame(cls, classes=""):
     if current_id is None:
         log.debug(f"Correspondence to component of class '{cls}' not found.")
         return
-    filled_template = TEMPLATE.replace("%ID%", current_id).replace("%CLASSES%", classes)
-    return html(f"<script>{filled_template}</script>")
+    text = f'<script>parent.document.addTokens("{current_id}", "{classes}", window)</script>'
+    return html(text)
 
 
 def tw_wrap(component, classes=""):

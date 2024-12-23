@@ -1,16 +1,13 @@
 [project]
 name = "st_tailwind"
-version = "1.0.5"
+version = "1.0.6"
 description = "Python tailwind toolkit - Injected with JS"
-authors = [
-    {name = "rafael.choinhet", email = "choinhet@gmail.com"},
-]
-dependencies = [
-    "streamlit>=1.38.0",
-]
+authors = [{ name = "rafael.choinhet", email = "choinhet@gmail.com" }]
+dependencies = ["streamlit>=1.38.0"]
 requires-python = ">=3.9.10"
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
 
 [tool.setuptools]
 packages = ["st_tailwind"]
+package-data = { "st_tailwind" = ["resources/frontend/*.js"] }
