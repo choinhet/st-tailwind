@@ -31,7 +31,10 @@ jobs:
           uv add --dev pytest pytest-cov pytest-playwright pytest-base-url psutil
           uv add streamlit
           uv pip install -e .
-          playwright install --with-deps
+      
+      - name: Install Playwright browsers
+        run: |
+          python -m playwright install --with-deps
       
       - name: Run unit tests with coverage
         run: |
