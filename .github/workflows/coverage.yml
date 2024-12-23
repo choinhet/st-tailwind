@@ -28,7 +28,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          uv add --dev pytest pytest-cov pytest-playwright pytest-base-url psutil coverage-badge
+          uv add --dev pytest pytest-cov pytest-playwright pytest-base-url psutil
           uv add streamlit
           uv pip install -e .
       
@@ -38,16 +38,15 @@ jobs:
           uv run playwright install --with-deps
       
       - name: Run unit tests with coverage
+        id: coverage
         run: |
-          uv run pytest tests/test_st_tailwind.py --cov=st_tailwind --cov-report=xml --cov-report=html --cov-report=term-missing
+          COVERAGE_OUTPUT=$(uv run pytest tests/test_st_tailwind.py --cov=st_tailwind --cov-report=xml --cov-report=html --cov-report=term-missing)
+          COVERAGE_PCT=$(echo "$COVERAGE_OUTPUT" | grep -oP "TOTAL\s+\d+\s+\d+\s+\K\d+")
+          echo "percentage=$COVERAGE_PCT" >> $GITHUB_OUTPUT
       
       - name: Run e2e tests
         run: |
           uv run pytest tests/e2e -v --headed
-      
-      - name: Generate coverage badge
-        run: |
-          uv run coverage-badge -o coverage.svg -f
       
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -56,13 +55,3 @@ jobs:
           path: |
             htmlcov
             coverage.xml
-            coverage.svg
-      
-      - name: Commit coverage badge
-        if: github.ref == 'refs/heads/master'
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add coverage.svg
-          git commit -m "docs: update coverage badge [skip ci]" || echo "No changes to commit"
-          git push

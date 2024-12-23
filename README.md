@@ -1,6 +1,6 @@
 # Streamlit Tailwind
 
-[![Coverage](coverage.svg)](../../actions/workflows/coverage.yml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](../../actions/workflows/coverage.yml)
 
 ## If you find this project useful, please consider leaving a star <3
 
