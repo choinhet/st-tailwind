@@ -1,6 +1,6 @@
 # Streamlit Tailwind
 
-[![Coverage](../../actions/workflows/coverage.yml/badge.svg)](../../actions/workflows/coverage.yml)
+[![Coverage](coverage.svg)](../../actions/workflows/coverage.yml)
 
 ## If you find this project useful, please consider leaving a star <3
 

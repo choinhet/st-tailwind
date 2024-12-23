@@ -28,7 +28,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          uv add --dev pytest pytest-cov pytest-playwright pytest-base-url psutil
+          uv add --dev pytest pytest-cov pytest-playwright pytest-base-url psutil coverage-badge
           uv add streamlit
           uv pip install -e .
       
@@ -45,6 +45,10 @@ jobs:
         run: |
           uv run pytest tests/e2e -v --headed
       
+      - name: Generate coverage badge
+        run: |
+          uv run coverage-badge -o coverage.svg -f
+      
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -52,3 +56,13 @@ jobs:
           path: |
             htmlcov
             coverage.xml
+            coverage.svg
+      
+      - name: Commit coverage badge
+        if: github.ref == 'refs/heads/master'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add coverage.svg
+          git commit -m "docs: update coverage badge [skip ci]" || echo "No changes to commit"
+          git push
