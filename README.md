@@ -1,5 +1,7 @@
 # Streamlit Tailwind
 
+[![Coverage](../../actions/workflows/coverage.yml/badge.svg)](../../actions/workflows/coverage.yml)
+
 ## If you find this project useful, please consider leaving a star <3
 
 This project, Streamlit Tailwind, is designed to simplify the process of creating user interfaces. It provides a straightforward way to incorporate Tailwind CSS into your Streamlit
@@ -17,7 +19,6 @@ pip install st_tailwind
 
 ![img.png](static/img.png)
 
-[![Coverage](../../actions/workflows/coverage.yml/badge.svg)](../../actions/workflows/coverage.yml)
 
 ```python
 import streamlit as st
