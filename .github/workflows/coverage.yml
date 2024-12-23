@@ -1,0 +1,50 @@
+name: Coverage
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install UV
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Install dependencies
+        run: |
+          uv add --dev pytest pytest-cov pytest-playwright pytest-base-url psutil
+          uv add streamlit
+          uv pip install -e .
+          playwright install --with-deps
+      
+      - name: Run unit tests with coverage
+        run: |
+          pytest tests/test_st_tailwind.py --cov=st_tailwind --cov-report=xml --cov-report=html --cov-report=term-missing
+      
+      - name: Run e2e tests
+        run: |
+          pytest tests/e2e -v --headed
+      
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            htmlcov
+            coverage.xml

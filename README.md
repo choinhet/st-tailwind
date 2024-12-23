@@ -17,6 +17,8 @@ pip install st_tailwind
 
 ![img.png](static/img.png)
 
+[![Coverage](../../actions/workflows/coverage.yml/badge.svg)](../../actions/workflows/coverage.yml)
+
 ```python
 import streamlit as st
 

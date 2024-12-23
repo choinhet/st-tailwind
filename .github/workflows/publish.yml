@@ -1,0 +1,110 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install UV
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      
+      - name: Get and bump version
+        id: get_version
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(grep '^version = ' pyproject.toml | cut -d'"' -f2)
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Split version into parts
+          IFS='.' read -r -a VERSION_PARTS <<< "$CURRENT_VERSION"
+          MAJOR="${VERSION_PARTS[0]}"
+          MINOR="${VERSION_PARTS[1]}"
+          PATCH="${VERSION_PARTS[2]}"
+          
+          # Get commit messages since last tag
+          COMMITS=$(git log $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD --pretty=format:"%s")
+          
+          # Determine version bump type
+          BUMP_TYPE="patch"  # default to patch
+          
+          echo "Analyzing commits for version bump type..."
+          while IFS= read -r commit; do
+            if [[ "$commit" == *"BREAKING CHANGE:"* ]] || [[ "$commit" == *"!"* ]]; then
+              echo "Found breaking change: $commit"
+              BUMP_TYPE="major"
+              break
+            elif [[ "$commit" == "feat:"* ]]; then
+              echo "Found feature: $commit"
+              BUMP_TYPE="minor"
+            fi
+          done <<< "$COMMITS"
+          
+          # Bump version according to type
+          if [ "$BUMP_TYPE" = "major" ]; then
+            NEW_VERSION="$((MAJOR + 1)).0.0"
+            echo "Bumping major version"
+          elif [ "$BUMP_TYPE" = "minor" ]; then
+            NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+            echo "Bumping minor version"
+          else
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+            echo "Bumping patch version"
+          fi
+          
+          echo "New version: $NEW_VERSION"
+          
+          # Update pyproject.toml
+          sed -i "s/^version = \"$CURRENT_VERSION\"/version = \"$NEW_VERSION\"/" pyproject.toml
+          
+          # Commit and push changes
+          git add pyproject.toml
+          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+          git push
+          
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: github.ref == 'refs/heads/master'
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            Version bump type: ${{ steps.get_version.outputs.bump_type }}
+            
+            ## What's Changed
+            ${{ join(github.event.commits.*.message, '\n') }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+      
+      - name: Build package
+        run: uv build
+      
+      - name: Publish to PyPI
+        run: uv publish --token ${{ secrets.PYPI_TOKEN }}

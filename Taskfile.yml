@@ -11,7 +11,82 @@ tasks:
       - uv publish --token {{PYPI_TOKEN}}
   run:
     cmds:
-      - uv streamlit run test/examples.py
+      - uv streamlit run tests/examples.py
   requirements:
     cmds:
       - uv pip compile pyproject.toml -o requirements.txt
+  setup-dev:
+    desc: Install development dependencies
+    cmds:
+      - uv add --dev pytest pytest-cov pytest-playwright psutil
+      - uv add streamlit
+      - playwright install chromium
+  test:
+    desc: Run unit tests
+    deps: [setup-dev]
+    cmds:
+      - pytest tests/test_st_tailwind.py -v
+  test-e2e:
+    desc: Run end-to-end tests
+    deps: [setup-dev]
+    cmds:
+      - pytest tests/e2e -v
+  coverage:
+    desc: Run tests with coverage report
+    deps: [setup-dev]
+    cmds:
+      - pytest --cov=st_tailwind --cov-report=html --cov-report=term-missing
+
+  codegen-basic:
+    desc: Run Playwright codegen for basic components example
+    cmds:
+      - cmd.exe /c "start streamlit run tests/basic_components_example.py"
+      - cmd.exe /c "timeout /t 5"
+      - playwright codegen http://localhost:8501
+
+  codegen-kpi:
+    desc: Run Playwright codegen for KPI dashboard example
+    cmds:
+      - cmd.exe /c "start streamlit run tests/kpi_dashboard_example.py"
+      - cmd.exe /c "timeout /t 5"
+      - playwright codegen http://localhost:8501
+
+  build:
+    desc: Build the package
+    cmds:
+      - uv pip install build
+      - python -m build
+
+  install:
+    desc: Install the package in development mode
+    cmds:
+      - uv pip install -e .
+
+  install-dev:
+    desc: Install development dependencies
+    cmds:
+      - uv pip install -e ".[dev]"
+
+  coverage:
+    desc: Run tests with coverage
+    cmds:
+      - uv pip install pytest pytest-cov
+      - pytest --cov=st_tailwind tests/
+
+  test:
+    desc: Run tests
+    cmds:
+      - pytest tests/
+
+  test-e2e:
+    desc: Run end-to-end tests
+    cmds:
+      - pytest tests/e2e/test_examples.py -v
+
+  publish:
+    desc: Publish to PyPI
+    cmds:
+      - uv pip install twine
+      - twine upload dist/*
+    env:
+      TWINE_USERNAME: __token__

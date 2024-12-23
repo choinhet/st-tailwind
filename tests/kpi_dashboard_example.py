@@ -1,3 +1,7 @@
+"""
+Example Streamlit app demonstrating a KPI dashboard with Tailwind styling.
+"""
+
 from typing import Union
 import streamlit as st
 import st_tailwind as tw

@@ -1,5 +1,13 @@
+"""
+Constants module for Streamlit Tailwind.
+
+This module contains mappings between Streamlit components and their corresponding CSS selectors
+used for applying Tailwind styles to the components.
+"""
+
 import streamlit as st
 
+# Mapping of Streamlit components to their CSS selectors
 correspondence = {
     st.button: "[data-testid='stBaseButton-secondary']",
     st.container: "[data-testid='stVerticalBlock']",
